@@ -19,6 +19,12 @@ class ForexController extends Controller
      */
     public function convert(string $amount, string $from, string $to)
     {
+        $amount = str_replace(',', '', $amount);
+
+        if(!is_numeric($amount)){
+            return $this->Error("Invalid amount");
+        }
+
         $forex = new Forex($from, $to);
 
         $currency = $forex->isCurrencyAllowed();

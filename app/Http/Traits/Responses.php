@@ -16,7 +16,7 @@ trait Responses {
 
     public function Error(string $msg = '')
     {
-        return response(json_encode(['error' => 1, 'msg' => $msg]), 400);
+        return response(json_encode(['error' => 1, 'msg' => $msg]), 200);
     }
 
 }

@@ -17,7 +17,7 @@ class CreateCachesTable extends Migration
             $table->id();
             $table->string('from');
             $table->string('to');
-            $table->decimal('rate', 10, 10);
+            $table->decimal('rate', 20, 10);
             $table->timestamps();
         });
     }

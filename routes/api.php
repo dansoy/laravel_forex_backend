@@ -25,5 +25,5 @@ Route::get('exchange/info', 'ForexController@info');
 Route::get('cache/clear', 'ForexController@clearCache');
 
 Route::fallback(function(){
-    return response(json_encode(['error' => 1, 'msg' => 'invalid request']), 404);
+    return response(json_encode(['error' => 1, 'msg' => 'invalid request']), 200);
 });
