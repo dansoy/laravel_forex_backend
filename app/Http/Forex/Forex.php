@@ -3,7 +3,7 @@
 namespace App\Http\Forex;
 
 use App\Cache;
-use Carbon\Carbon;
+use App\Jobs\DeleteCache;
 use Illuminate\Support\Facades\Http;
 
 class Forex {
@@ -111,8 +111,8 @@ class Forex {
                             ['from', $this->to], ['to', $this->from],
                         ])->first();
 
-        //if exists, check expiry. if expired delete
-        $time = Carbon::now()->startOfMinute()->subSeconds(config('forex.cache_time'));
+        //if exists, check expiry. if expired return 0
+        $time = now()->subSeconds(config('forex.cache_time'));
 
         if($this->cache && $time->lessThan($this->cache->updated_at))
         {
@@ -142,6 +142,7 @@ class Forex {
                 'rate' => $this->rate,
                 ]);
         }
+        DeleteCache::dispatch($this->cache)->delay(now()->addSeconds(config('forex.cache_time')));
     }
 
     /**
