@@ -18,6 +18,8 @@ class Forex {
 
     private $cache;
 
+    private $invalidCurrency;
+
     public function __construct(string $from = "", string $to = "")
     {
         if($from != "" && $to != "")
@@ -26,7 +28,9 @@ class Forex {
             $this->from = $from;
             $this->to = $to;
 
-            if($this->from != $this->to){
+            $this->invalidCurrency = $this->isCurrencyAllowed();
+
+            if($this->from != $this->to && !$this->invalidCurrency){
                 //Get Rate from Cache
                 $this->rate = $this->getRateFromCache();
 
@@ -46,21 +50,13 @@ class Forex {
     }
 
     /**
-     * Check if currency is allowed.
+     * Get invalid currency.
      *
      * @return string
      */
-    public function isCurrencyAllowed()
+    public function getInvalidCurrency()
     {
-        if(!in_array($this->from, config('forex.allowed_currencies')))
-        {
-            return $this->from;
-        }
-        elseif(!in_array($this->to, config('forex.allowed_currencies')))
-        {
-            return $this->to;
-        }
-        return 0;
+        return $this->invalidCurrency;
     }
 
     /**
@@ -117,7 +113,8 @@ class Forex {
         if($this->cache && $time->lessThan($this->cache->updated_at))
         {
             $this->fromCache = 1;
-            return $this->cache->rate;
+            $rate = $this->cache->from == $this->from ? $this->cache->rate : 1/$this->cache->rate;
+            return $rate;
         }
 
         return 0;
@@ -131,6 +128,7 @@ class Forex {
     {
         if($this->cache)
         {
+            //update rate if cache is expired and auto delete cache(queue worker) is disabled
             $newRate = $this->cache->from == $this->from ? $this->rate : 1/$this->rate;
             $this->cache->update(['rate' => $newRate]);
         }
@@ -159,6 +157,24 @@ class Forex {
             return $response['rates'][$this->to];
         }
 
+        return 0;
+    }
+
+    /**
+     * Check if currency is allowed.
+     *
+     * @return string
+     */
+    private function isCurrencyAllowed()
+    {
+        if(!in_array($this->from, config('forex.allowed_currencies')))
+        {
+            return $this->from;
+        }
+        elseif(!in_array($this->to, config('forex.allowed_currencies')))
+        {
+            return $this->to;
+        }
         return 0;
     }
 }

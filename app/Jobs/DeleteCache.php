@@ -16,6 +16,13 @@ class DeleteCache implements ShouldQueue
     protected $cache;
 
     /**
+     * Delete the job if its models no longer exist.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels = true;
+
+    /**
      * Create a new job instance.
      *
      * @return void

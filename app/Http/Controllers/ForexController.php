@@ -27,7 +27,7 @@ class ForexController extends Controller
 
         $forex = new Forex($from, $to);
 
-        $currency = $forex->isCurrencyAllowed();
+        $currency = $forex->getInvalidCurrency();
         if($currency){
             $msg = "currency code " . $currency . " not supported";
             return $this->Error($msg);
